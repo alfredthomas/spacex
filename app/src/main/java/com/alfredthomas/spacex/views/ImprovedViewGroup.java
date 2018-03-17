@@ -15,19 +15,18 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.BaseAdapter;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.RadioButton;
 import android.widget.Spinner;
 import android.widget.TextView;
 
+import com.alfredthomas.spacex.R;
 import com.alfredthomas.spacex.util.GetLaunchesTask;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
-import java.util.Collections;
 import java.util.List;
 
 public class ImprovedViewGroup extends ViewGroup
@@ -136,6 +135,11 @@ public class ImprovedViewGroup extends ViewGroup
         return new LayoutParams(p.width, p.height);
     }
 
+    //get String from id
+    public String getString(int id)
+    {
+        return this.getContext().getString(id);
+    }
     //create the filterview that will ultimately update the viewpager
     public OnClickListener createNewQueryPopup(final Context context, final WeakReference<ViewPager> viewPagerWeakReference)
     {
@@ -204,7 +208,8 @@ public class ImprovedViewGroup extends ViewGroup
     public Spinner createSpinner(Context context, List<String> spinnerArray)
     {
         Spinner spinner = new Spinner(context,Spinner.MODE_DROPDOWN);
-        ArrayAdapter<String> spinnerAdapter = new ArrayAdapter<String>(context,android.R.layout.simple_spinner_dropdown_item,spinnerArray);
+        ArrayAdapter<String> spinnerAdapter = new ArrayAdapter<String>(context, R.layout.spinner_dropdown_item,spinnerArray);
+
         spinner.setAdapter(spinnerAdapter);
         return spinner;
     }
@@ -215,7 +220,7 @@ public class ImprovedViewGroup extends ViewGroup
         //since years for Space-X start in 2006, we can start there and go to current year +1
         List<String> years= new ArrayList<>();
         //workaround for empty spinner at start
-        years.add("");
+        years.add("-");
         for(int i = 2006; i<= Calendar.getInstance().get(Calendar.YEAR)+1;i++) {
             years.add(Integer.toString(i));
         }
@@ -266,7 +271,7 @@ public class ImprovedViewGroup extends ViewGroup
 
         border.setColor(Color.TRANSPARENT);
         border.setStroke(1, Color.BLACK);
-        border.setCornerRadius(45);
+        border.setCornerRadius(50);
 
         view.setBackground(border);
     }
@@ -316,6 +321,8 @@ public class ImprovedViewGroup extends ViewGroup
                 //use textview creator and set the value
                 if(view == null) {
                     view = createTextView(viewGroup.getContext(), (String) getItem(i));
+                    ((TextView) view).setGravity(Gravity.LEFT);
+                    ((TextView) view).setPadding(15,5,5,5);
                 }
                 //set text on reuse
                 else {

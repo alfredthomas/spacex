@@ -1,10 +1,7 @@
 package com.alfredthomas.spacex.views;
 
-import android.app.AlertDialog;
 import android.content.Context;
 import android.support.v4.view.ViewPager;
-
-import android.util.Log;
 
 import android.widget.Button;
 import android.widget.ImageView;

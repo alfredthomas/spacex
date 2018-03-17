@@ -3,12 +3,10 @@ package com.alfredthomas.spacex.views;
 
 import android.app.DatePickerDialog;
 import android.content.Context;
-import android.graphics.Color;
+import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
-import android.widget.Button;
+
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.LinearLayout;
@@ -17,12 +15,13 @@ import android.widget.RadioGroup;
 import android.widget.Spinner;
 import android.widget.TextView;
 
+import com.alfredthomas.spacex.R;
 import com.alfredthomas.spacex.util.GetLaunchesTask;
 import com.alfredthomas.spacex.util.NameValuePair;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
+
 import java.util.Calendar;
 import java.util.List;
 import java.util.Locale;
@@ -33,9 +32,8 @@ import java.util.Locale;
 
 public class FilterView extends ImprovedViewGroup {
     TextView description;
-    TextView startDateTV;
+    TextView dateRangeTV;
     EditText startDateET;
-    TextView endDateTV;
     EditText endDateET;
     TextView launchYearTV;
     Spinner launchYearSpinner;
@@ -62,26 +60,10 @@ public class FilterView extends ImprovedViewGroup {
     public FilterView(Context context) {
         super(context);
 
-        description = createTextView(context,"Please enter any filters. Any text entered will be added to query string");
+        description = super.createTextView(context,"Please enter any filters. Any text entered will be added to query string");
         addView(description);
 
-        startDateTV = createTextView(context,"start");
-        startDateET = createEditText(context,"YYYY-MM-dd");
-        addView(startDateTV);
-        addView(startDateET);
-
-
-        endDateTV = createTextView(context,"final");
-        endDateET = createEditText(context,"YYYY-MM-dd");
-        addView(endDateTV);
-        addView(endDateET);
-
-
-        launchYearTV = createTextView(context,"launch_year");
-        launchYearSpinner = createYearSpinner(context);
-        addView(launchYearTV);
-        addView(launchYearSpinner);
-
+        //launch type radio buttons
         launchTypeGroup = new RadioGroup(context);
         launchTypeGroup.setOrientation(LinearLayout.HORIZONTAL);
         launchTypeGroup.setGravity(Gravity.CENTER);
@@ -99,19 +81,47 @@ public class FilterView extends ImprovedViewGroup {
         launchTypeGroup.check(all.getId());
         addView(launchTypeGroup);
 
-        launchSuccessText = createTextView(context,"launch_success");
-        launchSuccessSpinner = createSpinner(context,"","true","false");
+        dateRangeTV = createTextView(context,getString(R.string.filter_start_desc));
+        startDateET = createEditText(context,"YYYY-MM-dd","from");
+        endDateET = createEditText(context,"YYYY-MM-dd","to");
+        addView(dateRangeTV);
+        addView(startDateET);
+
+
+        addView(endDateET);
+
+
+        launchYearTV = createTextView(context,getString(R.string.filter_launch_year_desc));
+        launchYearSpinner = createYearSpinner(context);
+        addView(launchYearTV);
+        addView(launchYearSpinner);
+
+
+
+        launchSuccessText = createTextView(context,getString(R.string.filter_launch_success_desc));
+        launchSuccessSpinner = createSpinner(context,"-","true","false");
         addView(launchSuccessText);
         addView(launchSuccessSpinner);
 
-        landSuccessText = createTextView(context,"land_success");
-        landSuccessSpinner = createSpinner(context,"","true","false");
+        landSuccessText = createTextView(context,getString(R.string.filter_land_success_desc));
+        landSuccessSpinner = createSpinner(context,"-","true","false");
         addView(landSuccessText);
         addView(landSuccessSpinner);
     }
-    public EditText createEditText(Context context, String format)
+    @Override
+    public TextView createTextView(Context context,String value)
+    {
+        TextView textView = super.createTextView(context,value);
+        textView.setGravity(Gravity.CENTER_VERTICAL);
+        textView.setTextAlignment(TEXT_ALIGNMENT_TEXT_START);
+        return textView;
+    }
+    public EditText createEditText(Context context, String format, String hintText)
     {
         EditText editText = new EditText(context);
+        editText.setTextSize(TypedValue.COMPLEX_UNIT_DIP,12);
+        editText.setGravity(Gravity.CENTER);
+        editText.setHint(hintText);
         editText.setOnClickListener(datePickerOnClickListener(format));
         editText.setFocusable(false);
         editText.setCompoundDrawables(null,null, getResources().getDrawable(android.R.drawable.ic_menu_my_calendar),null);
@@ -127,26 +137,26 @@ public class FilterView extends ImprovedViewGroup {
         //only true if both start and end have values
         if(startDateET.getText().length()>0 && endDateET.getText().length()>0)
         {
-            filters.add(new NameValuePair(startDateTV.getText().toString(),startDateET.getText().toString()));
-            filters.add(new NameValuePair(endDateTV.getText().toString(),endDateET.getText().toString()));
+            filters.add(new NameValuePair(getString(R.string.filter_start_key),startDateET.getText().toString()));
+            filters.add(new NameValuePair(getString(R.string.filter_final_key),endDateET.getText().toString()));
         }
 
         //if launch year has a value
-        if(!launchYearSpinner.getSelectedItem().toString().isEmpty() )
+        if(!launchYearSpinner.getSelectedItem().toString().equals("-"))
         {
-            filters.add(new NameValuePair(launchYearTV.getText().toString(),launchYearSpinner.getSelectedItem().toString()));
+            filters.add(new NameValuePair(getString(R.string.filter_launch_year_key),launchYearSpinner.getSelectedItem().toString()));
         }
 
         //if launch success has a value
-        if(!launchSuccessSpinner.getSelectedItem().toString().isEmpty())
+        if(!launchSuccessSpinner.getSelectedItem().toString().equals("-"))
         {
-            filters.add(new NameValuePair(launchSuccessText.getText().toString(),launchSuccessSpinner.getSelectedItem().toString()));
+            filters.add(new NameValuePair(getString(R.string.filter_launch_success_key),launchSuccessSpinner.getSelectedItem().toString()));
         }
 
         //if land success has a value
-        if(!landSuccessSpinner.getSelectedItem().toString().isEmpty())
+        if(!landSuccessSpinner.getSelectedItem().toString().equals("-"))
         {
-            filters.add(new NameValuePair(landSuccessText.getText().toString(),landSuccessSpinner.getSelectedItem().toString()));
+            filters.add(new NameValuePair(getString(R.string.filter_land_success_key),landSuccessSpinner.getSelectedItem().toString()));
         }
         return filters;
     }
@@ -211,31 +221,30 @@ public class FilterView extends ImprovedViewGroup {
 
         int padding= (int)(5f*getResources().getDisplayMetrics().density);
 
-        int tvWidth = width/5*2;
-        int otherWidth = width-tvWidth;
+        width-=(padding*2);
+        int tvWidth = (width/2) - padding;
+        int otherWidth = (width-tvWidth)-padding;
         int lineHeight = height/10;
         int y = padding*2;
         measureView(launchTypeGroup,padding,y,width,lineHeight);
 
         y+=lineHeight;
 
-        measureView(description,0,y,width,lineHeight);
+        measureView(description,padding,y,width,lineHeight);
         y+=lineHeight;
 
-        measureView(startDateTV,0,y,tvWidth,lineHeight);
-        measureView(startDateET,tvWidth,y,otherWidth,lineHeight);
+        measureView(dateRangeTV,padding,y,tvWidth,lineHeight);
+        measureView(startDateET,tvWidth +padding,y,otherWidth/2,lineHeight);
+        measureView(endDateET,tvWidth+(otherWidth/2),y,otherWidth/2,lineHeight);
         y+=lineHeight;
-        measureView(endDateTV,0,y,tvWidth,lineHeight);
-        measureView(endDateET,tvWidth,y,otherWidth,lineHeight);
-        y+=lineHeight;
-        measureView(launchYearTV,0,y,tvWidth,lineHeight);
+        measureView(launchYearTV,padding,y,tvWidth,lineHeight);
 //        measureView(launchYearET,tvWidth,y,otherWidth,lineHeight);
         measureView(launchYearSpinner,tvWidth,y,otherWidth,lineHeight);
         y+=lineHeight;
-        measureView(launchSuccessText,0,y,tvWidth,lineHeight);
+        measureView(launchSuccessText,padding,y,tvWidth,lineHeight);
         measureView(launchSuccessSpinner,tvWidth,y,otherWidth,lineHeight);
         y+=lineHeight;
-        measureView(landSuccessText,0,y,tvWidth,lineHeight);
+        measureView(landSuccessText,padding,y,tvWidth,lineHeight);
         measureView(landSuccessSpinner,tvWidth,y,otherWidth,lineHeight);
         y+=lineHeight;
 

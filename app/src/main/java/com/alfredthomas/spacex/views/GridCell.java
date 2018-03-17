@@ -51,7 +51,7 @@ public class GridCell extends ImprovedViewGroup {
 
         //operate on a 20/80 height ratio of textview to imageview
 
-        measureView(date,padding,padding,width-padding,(int)(height*0.2)-padding);
-        measureView(patch,padding,(int)(height*0.2),width-padding,(int)(height*0.8)-padding);
+        measureView(date,padding,padding,width-padding-padding,(int)(height*0.2)-padding);
+        measureView(patch,padding,(int)(height*0.2),width-padding-padding,(int)(height*0.8)-padding);
     }
 }

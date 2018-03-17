@@ -2,7 +2,6 @@ package com.alfredthomas.spacex.views;
 
 import android.content.Context;
 import android.graphics.Color;
-import android.os.AsyncTask;
 import android.support.v4.view.ViewPager;
 import android.util.DisplayMetrics;
 import android.view.Gravity;
@@ -31,6 +30,7 @@ public class QuickSelectorView extends ImprovedViewGroup {
     List<Launch> launches;
     int width;
     int height;
+    int columns;
 
     /*
         Used as a table of contents type page. Show mission patches and allow for quick jumping.
@@ -51,13 +51,11 @@ public class QuickSelectorView extends ImprovedViewGroup {
 
         gridView = new GridView(context);
         gridView.setAdapter(createGridAdapter());
-        gridView.setNumColumns(3);
-        gridView.setColumnWidth(GridView.AUTO_FIT);
+        columns = 3;
+        gridView.setNumColumns(columns);
 
         gridView.setVerticalSpacing(padding);
-        gridView.setHorizontalSpacing(padding);
-        gridView.setStretchMode(GridView.STRETCH_COLUMN_WIDTH);
-
+        gridView.setHorizontalSpacing(padding*2);
 
         addView(gridView);
 
@@ -80,9 +78,9 @@ public class QuickSelectorView extends ImprovedViewGroup {
         newQueryButton.setOnClickListener( createNewQueryPopup(context,viewPagerWeakReference));
 
         DisplayMetrics displaymetrics = getResources().getDisplayMetrics();
-        width = displaymetrics.widthPixels;
-        height = displaymetrics.heightPixels;
-
+        width = (((displaymetrics.widthPixels-(padding*2))-(padding*columns*2))/columns);
+        height = displaymetrics.heightPixels/4;
+        //height = gridView.getMeasuredHeight()/4;
         addView(newQueryButton);
     }
     private BaseAdapter createGridAdapter()
@@ -108,7 +106,7 @@ public class QuickSelectorView extends ImprovedViewGroup {
             public View getView(int i, View view, ViewGroup viewGroup) {
                 if(view == null) {
                     view = new GridCell(viewGroup.getContext());
-                    view.setLayoutParams(new GridView.LayoutParams(width/3, height/4));
+                    view.setLayoutParams(new GridView.LayoutParams(width, height));
 
                 }
                 //let picasso handle cancelling tasks
@@ -144,7 +142,7 @@ public class QuickSelectorView extends ImprovedViewGroup {
 
 
         measureView(noDataToDisplay,padding,height/4,width-padding-padding,height/4);
-        measureView(gridView,padding,padding,width,height/5*4);
+        measureView(gridView,padding,padding,width-padding-padding,height/5*4);
 
         measureView(newQueryButton,padding,height/5*4,width-padding-padding,height/4-padding-padding);
     }
